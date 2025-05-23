@@ -17,7 +17,7 @@ def set_page_config_and_styles():
             color: white;
         }
         h1, h2, h3, h4, h5, h6 {
-            color: white;
+            color: white; /* Ensure headers are visible */
         }
         .stButton>button {
             color: white;
@@ -44,7 +44,7 @@ def set_page_config_and_styles():
             color: black;
         }
         div[data-testid="stAlert"] {
-            background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
@@ -63,8 +63,7 @@ def load_uploaded_file(uploaded_file):
     try:
         if uploaded_file.type == "text/csv":
             return pd.read_csv(uploaded_file)
-        elif uploaded_file.type in ["application/vnd.ms-excel",
-                                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
+        elif uploaded_file.type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             return pd.read_excel(uploaded_file)
         elif uploaded_file.type == "application/json":
             return pd.read_json(uploaded_file)
@@ -101,7 +100,7 @@ def detect_column_types(df):
             if col not in geo_cols:
                 geo_cols.append(col)
 
-    # Remove datetime overlap from categorical and numeric types.
+    # Remove datetime overlap from others.
     categorical_cols = [c for c in categorical_cols if c not in datetime_cols]
     numeric_cols = [c for c in numeric_cols if c not in datetime_cols]
 
@@ -266,6 +265,7 @@ def plot_univariate_custom(df, numeric_cols, categorical_cols, datetime_cols):
             chart_type = st.selectbox(f"Select chart type for '{col}'", options, key=f"{col}_cat_uni")
             count_df = df[col].value_counts().reset_index()
             count_df.columns = [col, 'count']
+
             if chart_type == 'Bar Chart':
                 fig = px.bar(count_df, x=col, y='count', title=f"Bar Chart: {col} Value Counts", template="plotly_white")
                 st.plotly_chart(fig, use_container_width=True)
@@ -334,6 +334,7 @@ def plot_univariate_custom(df, numeric_cols, categorical_cols, datetime_cols):
 # --- Bivariate Analysis ---
 def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo_cols):
     charts_bivariate = []
+
     st.subheader("🔗 Bivariate Analysis")
 
     # Numeric vs Numeric
@@ -468,10 +469,8 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
     st.markdown("---")
     st.markdown("##### Geospatial Analysis")
     
-    # Multiple free map options:
-    map_type = st.selectbox("Select Map Type",
-                            ["Scatter Map", "Choropleth Map", "Density Map", "Bubble Map"],
-                            key="map_type_selector")
+    # New: let the user choose the map type
+    map_type = st.selectbox("Select Map Type", ["Scatter Map", "Choropleth Map"], key="map_type_selector")
     lat_found = next((c for c in geo_cols if 'lat' in c.lower()), None)
     lon_found = next((c for c in geo_cols if 'lon' in c.lower()), None)
 
@@ -481,6 +480,7 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
             fig = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, zoom=3, height=400, title="Map: Locations")
             fig.update_layout(mapbox_style="open-street-map")
             charts_bivariate.append(fig)
+            # Option to color the map points by another column
             if numeric_cols or categorical_cols:
                 all_colorable_cols = numeric_cols + categorical_cols
                 color_by_col_map_check = st.checkbox("Color map points by another column?", key="color_map_check")
@@ -509,7 +509,7 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
                     st.info("No other suitable columns (numeric or categorical) to color the map points by.")
         else:
             st.info("Latitude and Longitude columns not found. Please ensure your dataset has valid lat and long fields for a Scatter Map.")
-
+    
     elif map_type == "Choropleth Map":
         if geo_cols and numeric_cols:
             region_col_candidates = [c for c in geo_cols if c not in [lat_found, lon_found]]
@@ -540,35 +540,6 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
         else:
             st.info("Geospatial columns are insufficient to create a Choropleth Map.")
 
-    elif map_type == "Density Map":
-        if lat_found and lon_found:
-            st.write(f"Density Map using Latitude: *{lat_found}* and Longitude: *{lon_found}*")
-            if numeric_cols:
-                density_col = st.selectbox("Select numeric column for density weight", numeric_cols, key="density_map_numeric")
-                radius_val = st.slider("Select radius for density map", 5, 50, 10, key="density_radius")
-                fig = px.density_mapbox(df, lat=lat_found, lon=lon_found, z=density_col, radius=radius_val,
-                                        zoom=3, height=400, title=f"Density Map of {density_col}",
-                                        mapbox_style="open-street-map")
-                charts_bivariate.append(fig)
-            else:
-                st.info("No numeric column available for density mapping.")
-        else:
-            st.info("Latitude and Longitude columns not found for Density Map.")
-
-    elif map_type == "Bubble Map":
-        if lat_found and lon_found:
-            st.write(f"Bubble Map using Latitude: *{lat_found}* and Longitude: *{lon_found}*")
-            if numeric_cols:
-                bubble_size = st.selectbox("Select numeric column for Bubble Map size", numeric_cols, key="bubble_map_size")
-                fig = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, size=bubble_size, color=bubble_size,
-                                        zoom=3, height=400, title=f"Bubble Map: Size by {bubble_size}", template="plotly_white")
-                fig.update_layout(mapbox_style="open-street-map")
-                charts_bivariate.append(fig)
-            else:
-                st.info("No numeric column available for bubble map.")
-        else:
-            st.info("Latitude and Longitude columns not found for Bubble Map.")
-
     return charts_bivariate
 
 # --- Revised Charts Grid Display ---
@@ -596,9 +567,11 @@ def generate_dashboard(df):
     generate_kpis(df, numeric_cols)
     filters = generate_filters(df, categorical_cols)
     df_filtered = apply_filters(df, filters)
+
     if df_filtered.empty:
         st.warning("No data remains after applying filters. Please adjust your filter selections.")
         return
+
     plot_univariate_custom(df_filtered, numeric_cols, categorical_cols, datetime_cols)
     st.markdown("---")
     charts_bivariate = plot_charts_bivariate(df_filtered, numeric_cols, categorical_cols, datetime_cols, geo_cols)
@@ -621,7 +594,7 @@ def main():
         if df is not None:
             st.subheader("🔍 Dataset Preview")
             st.dataframe(df.head())
-
+            
             st.markdown("## Remove Unwanted Features")
             # Remove unwanted features in main page (not sidebar)
             columns_to_drop = st.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
@@ -630,19 +603,24 @@ def main():
                 st.info("Dropped columns: " + ", ".join(columns_to_drop))
                 st.dataframe(df.head())
 
+            # Clean Data button
             if st.button("✨ Clean Data", key="clean_data_button"):
                 with st.spinner("Cleaning data... This may take a moment..."):
                     df = clean_data(df.copy())
-                if df is not None:
-                    st.session_state['cleaned_df'] = df.copy()
-
+                st.session_state['cleaned_df'] = df.copy()
+            
+            # Use cleaned data if available
             if 'cleaned_df' in st.session_state and st.session_state['cleaned_df'] is not None:
                 df = st.session_state['cleaned_df']
+            else:
+                st.info("Click '✨ Clean Data' to prepare your dataset for analysis.")
+                return
 
             if df is None or df.empty:
                 st.warning("Please upload a file and/or ensure data cleaning did not result in an empty dataset.")
                 return
 
+            
             numeric_cols, categorical_cols, datetime_cols, geo_cols = detect_column_types(df)
             if not df.empty and (numeric_cols or categorical_cols or datetime_cols or geo_cols):
                 generate_dashboard(df)
@@ -675,5 +653,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
