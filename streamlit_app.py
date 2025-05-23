@@ -594,14 +594,6 @@ def main():
         if df is not None:
             st.subheader("🔍 Dataset Preview")
             st.dataframe(df.head())
-            
-            st.markdown("## Remove Unwanted Features")
-            # Remove unwanted features in main page (not sidebar)
-            columns_to_drop = st.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
-            if columns_to_drop:
-                df = df.drop(columns=columns_to_drop, errors='ignore')
-                st.info("Dropped columns: " + ", ".join(columns_to_drop))
-                st.dataframe(df.head())
 
             # Clean Data button
             if st.button("✨ Clean Data", key="clean_data_button"):
@@ -620,7 +612,17 @@ def main():
                 st.warning("Please upload a file and/or ensure data cleaning did not result in an empty dataset.")
                 return
 
-            
+            st.sidebar.subheader("Dataset Operations")
+            columns_to_drop = st.sidebar.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
+            if columns_to_drop:
+                if columns_to_drop != st.session_state.get('last_dropped_cols', []):
+                    df = df.drop(columns=columns_to_drop, errors='ignore')
+                    st.session_state['cleaned_df'] = df.copy()
+                    st.session_state['last_dropped_cols'] = columns_to_drop
+                    st.experimental_rerun()
+                else:
+                    df = df.drop(columns=columns_to_drop, errors='ignore')
+
             numeric_cols, categorical_cols, datetime_cols, geo_cols = detect_column_types(df)
             if not df.empty and (numeric_cols or categorical_cols or datetime_cols or geo_cols):
                 generate_dashboard(df)
