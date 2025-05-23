@@ -32,9 +32,7 @@ def set_page_config_and_styles():
         }
         .stSelectbox div[data-baseweb="select"] > div,
         .stMultiSelect div[data-baseweb="select"] > div,
-        .stTextInput input,
-        .stNumberInput input,
-        .stTextArea textarea {
+        .stTextInput input {
             background-color: white;
             color: black;
         }
@@ -561,14 +559,14 @@ def generate_dashboard(df):
     charts_bivariate = plot_charts_bivariate(df_filtered, numeric_cols, categorical_cols, datetime_cols, geo_cols)
     display_charts_grid(charts_bivariate)
 
-# --- Streamlit App Entry Point ---
+# --- Main App ---
 def main():
     set_page_config_and_styles()
     st.title("🚀 AutoViz Dashboard: Visualize Data Effortlessly 🚀")
     
     uploaded_file = st.file_uploader("Upload a file (CSV, Excel, JSON)", type=['csv', 'xlsx', 'json'])
     if uploaded_file:
-        # Identify file uniquely by file name
+        # Identify file uniquely by filename
         if 'last_uploaded_file_id' not in st.session_state or uploaded_file.name != st.session_state['last_uploaded_file_id']:
             st.session_state['cleaned_df'] = None
             st.session_state['last_uploaded_file_id'] = uploaded_file.name
@@ -580,17 +578,16 @@ def main():
 
             # --- Unwanted Feature Removal Section (Below Dataset Preview) ---
             st.subheader("🚀 Unwanted Feature Removal")
-            # Provide a radio selection so the user must confirm their decision.
             option_list = ["Select an option", "Keep all features", "Remove selected features"]
             decision = st.radio("Do you want to remove any unwanted features?", option_list, index=0, key="remove_decision")
             if decision == "Remove selected features":
                 columns_to_remove = st.multiselect("Select columns to remove from analysis:", options=list(df.columns), key="feature_drop")
             elif decision == "Keep all features":
-                columns_to_remove = []  # Explicit confirmation to keep all features.
+                columns_to_remove = []  # No columns to remove
             else:
-                columns_to_remove = None  # No decision yet.
+                columns_to_remove = None  # No decision made yet
 
-            # Disable Clean Data button until a decision is made.
+            # Disable Clean Data button until a decision is made
             clean_disabled = (decision == "Select an option")
             if st.button("✨ Clean Data", key="clean_data_button", disabled=clean_disabled):
                 with st.spinner("Cleaning data... This may take a moment..."):
@@ -602,14 +599,14 @@ def main():
             if "cleaned_df" in st.session_state and st.session_state["cleaned_df"] is not None:
                 df = st.session_state["cleaned_df"]
             else:
-                st.info("Please select your option and then click '✨ Clean Data' to prepare your dataset for analysis.")
+                st.info("Please select your option above and then click '✨ Clean Data' to prepare your dataset for analysis.")
                 return
 
             if df is None or df.empty:
                 st.warning("Please upload a file and/or ensure data cleaning did not result in an empty dataset.")
                 return
 
-            # Generate the remaining dashboard (filters, KPIs, charts)
+            # Generate the rest of the dashboard (filters, KPIs, charts)
             numeric_cols, categorical_cols, datetime_cols, geo_cols = detect_column_types(df)
             if not df.empty and (numeric_cols or categorical_cols or datetime_cols or geo_cols):
                 generate_dashboard(df)
