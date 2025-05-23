@@ -63,7 +63,8 @@ def load_uploaded_file(uploaded_file):
     try:
         if uploaded_file.type == "text/csv":
             return pd.read_csv(uploaded_file)
-        elif uploaded_file.type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
+        elif uploaded_file.type in ["application/vnd.ms-excel", 
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             return pd.read_excel(uploaded_file)
         elif uploaded_file.type == "application/json":
             return pd.read_json(uploaded_file)
@@ -623,23 +624,22 @@ def main():
 
         df = load_uploaded_file(uploaded_file)
         if df is not None:
-            # --- Dataset Operations BEFORE cleaning ---
-            st.sidebar.subheader("Dataset Operations")
-            columns_to_drop = st.sidebar.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
-            if columns_to_drop:
-                df = df.drop(columns=columns_to_drop, errors='ignore')
-                st.info("Dropped columns: " + ", ".join(columns_to_drop))
-            
             st.subheader("🔍 Dataset Preview")
             st.dataframe(df.head())
 
-            # Clean Data button
+            st.markdown("### Dataset Operations")
+            # Let you choose unwanted features after preview
+            columns_to_drop = st.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
+            if columns_to_drop:
+                df = df.drop(columns=columns_to_drop, errors='ignore')
+                st.info("Dropped columns: " + ", ".join(columns_to_drop))
+                st.dataframe(df.head())
+
             if st.button("✨ Clean Data", key="clean_data_button"):
                 with st.spinner("Cleaning data... This may take a moment..."):
                     df = clean_data(df.copy())
                 st.session_state['cleaned_df'] = df.copy()
             
-            # Use cleaned data if available
             if 'cleaned_df' in st.session_state and st.session_state['cleaned_df'] is not None:
                 df = st.session_state['cleaned_df']
             
@@ -679,4 +679,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
