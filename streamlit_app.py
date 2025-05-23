@@ -44,7 +44,7 @@ def set_page_config_and_styles():
             color: black;
         }
         div[data-testid="stAlert"] {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255,255,255,0.1);
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
@@ -63,8 +63,8 @@ def load_uploaded_file(uploaded_file):
     try:
         if uploaded_file.type == "text/csv":
             return pd.read_csv(uploaded_file)
-        elif uploaded_file.type in ["application/vnd.ms-excel", 
-                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
+        elif uploaded_file.type in ["application/vnd.ms-excel",
+                                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
             return pd.read_excel(uploaded_file)
         elif uploaded_file.type == "application/json":
             return pd.read_json(uploaded_file)
@@ -633,7 +633,8 @@ def main():
             if st.button("✨ Clean Data", key="clean_data_button"):
                 with st.spinner("Cleaning data... This may take a moment..."):
                     df = clean_data(df.copy())
-                st.session_state['cleaned_df'] = df.copy()
+                if df is not None:
+                    st.session_state['cleaned_df'] = df.copy()
 
             if 'cleaned_df' in st.session_state and st.session_state['cleaned_df'] is not None:
                 df = st.session_state['cleaned_df']
@@ -674,6 +675,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
