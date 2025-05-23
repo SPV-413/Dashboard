@@ -595,33 +595,24 @@ def main():
             st.subheader("🔍 Dataset Preview")
             st.dataframe(df.head())
 
-            # Clean Data button
-            if st.button("✨ Clean Data", key="clean_data_button"):
-                with st.spinner("Cleaning data... This may take a moment..."):
-                    df = clean_data(df.copy())
-                st.session_state['cleaned_df'] = df.copy()
-            
-            # Use cleaned data if available
+            # Feature Removal Section BELOW dataset preview
+            st.subheader("🚀 Unwanted Feature Removal")
+            columns_to_drop = st.multiselect("Select columns to remove from analysis:", options=list(df.columns), key="feature_removal")
+
+    # Condition: Disable the Clean Data button UNTIL user interacts with feature selection
+            clean_disabled = not columns_to_drop  # Only enable button when user selects at least one feature
+
+            if not clean_disabled:
+                if st.button("✨ Clean Data", key="clean_data_button"):
+                    with st.spinner("Cleaning data..."):
+                        df = df.drop(columns=columns_to_drop)
+                        df = clean_data(df)
+                        st.session_state['cleaned_df'] = df.copy()
+    
             if 'cleaned_df' in st.session_state and st.session_state['cleaned_df'] is not None:
                 df = st.session_state['cleaned_df']
-            else:
-                st.info("Click '✨ Clean Data' to prepare your dataset for analysis.")
-                return
 
-            if df is None or df.empty:
-                st.warning("Please upload a file and/or ensure data cleaning did not result in an empty dataset.")
-                return
-
-            st.sidebar.subheader("Dataset Operations")
-            columns_to_drop = st.sidebar.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
-            if columns_to_drop:
-                if columns_to_drop != st.session_state.get('last_dropped_cols', []):
-                    df = df.drop(columns=columns_to_drop, errors='ignore')
-                    st.session_state['cleaned_df'] = df.copy()
-                    st.session_state['last_dropped_cols'] = columns_to_drop
-                    st.experimental_rerun()
-                else:
-                    df = df.drop(columns=columns_to_drop, errors='ignore')
+            return df
 
             numeric_cols, categorical_cols, datetime_cols, geo_cols = detect_column_types(df)
             if not df.empty and (numeric_cols or categorical_cols or datetime_cols or geo_cols):
