@@ -17,7 +17,7 @@ def set_page_config_and_styles():
             color: white;
         }
         h1, h2, h3, h4, h5, h6 {
-            color: white; /* Ensure headers are visible */
+            color: white;
         }
         .stButton>button {
             color: white;
@@ -100,7 +100,7 @@ def detect_column_types(df):
             if col not in geo_cols:
                 geo_cols.append(col)
 
-    # Remove datetime overlap from categorical and numeric types
+    # Remove datetime overlap from categorical and numeric types.
     categorical_cols = [c for c in categorical_cols if c not in datetime_cols]
     numeric_cols = [c for c in numeric_cols if c not in datetime_cols]
 
@@ -469,7 +469,7 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
     st.markdown("---")
     st.markdown("##### Geospatial Analysis")
     
-    # Adding multiple free map options
+    # Adding multiple free map options:
     map_type = st.selectbox("Select Map Type",
                             ["Scatter Map", "Choropleth Map", "Density Map", "Bubble Map"],
                             key="map_type_selector")
@@ -623,19 +623,15 @@ def main():
 
         df = load_uploaded_file(uploaded_file)
         if df is not None:
-            st.subheader("🔍 Dataset Preview")
-            st.dataframe(df.head())
-            
+            # --- Dataset Operations BEFORE cleaning ---
             st.sidebar.subheader("Dataset Operations")
             columns_to_drop = st.sidebar.multiselect("Select columns to REMOVE from analysis:", options=list(df.columns), key="initial_drop_cols")
             if columns_to_drop:
-                if columns_to_drop != st.session_state.get('last_dropped_cols', []):
-                    df = df.drop(columns=columns_to_drop, errors='ignore')
-                    st.session_state['cleaned_df'] = df.copy()
-                    st.session_state['last_dropped_cols'] = columns_to_drop
-                    st.experimental_rerun()
-                else:
-                    df = df.drop(columns=columns_to_drop, errors='ignore')
+                df = df.drop(columns=columns_to_drop, errors='ignore')
+                st.info("Dropped columns: " + ", ".join(columns_to_drop))
+            
+            st.subheader("🔍 Dataset Preview")
+            st.dataframe(df.head())
 
             # Clean Data button
             if st.button("✨ Clean Data", key="clean_data_button"):
@@ -646,14 +642,10 @@ def main():
             # Use cleaned data if available
             if 'cleaned_df' in st.session_state and st.session_state['cleaned_df'] is not None:
                 df = st.session_state['cleaned_df']
-            else:
-                st.info("Click '✨ Clean Data' to prepare your dataset for analysis.")
-                return
-
+            
             if df is None or df.empty:
                 st.warning("Please upload a file and/or ensure data cleaning did not result in an empty dataset.")
                 return
-
 
             numeric_cols, categorical_cols, datetime_cols, geo_cols = detect_column_types(df)
             if not df.empty and (numeric_cols or categorical_cols or datetime_cols or geo_cols):
@@ -687,3 +679,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
