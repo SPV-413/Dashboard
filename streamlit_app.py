@@ -577,7 +577,7 @@ def main():
             st.dataframe(df.head())
 
             # --- Unwanted Feature Removal Section (Below Dataset Preview) ---
-            st.subheader("🚀 Unwanted Feature Removal")
+            st.subheader("🗑 Unwanted Feature Removal")
             option_list = ["Select an option", "Keep all features", "Remove selected features"]
             decision = st.radio("Do you want to remove any unwanted features?", option_list, index=0, key="remove_decision")
             if decision == "Remove selected features":
