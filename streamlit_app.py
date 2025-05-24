@@ -589,7 +589,7 @@ def main():
 
             # Disable Clean Data button until a decision is made
             clean_disabled = (decision == "Select an option")
-            if st.button("✨ Clean Data", key="clean_data_button", disabled=clean_disabled):
+            if st.button("⚡ Clean Data", key="clean_data_button", disabled=clean_disabled):
                 with st.spinner("Cleaning data... This may take a moment..."):
                     if columns_to_remove is not None:
                         df = df.drop(columns=columns_to_remove, errors="ignore")
