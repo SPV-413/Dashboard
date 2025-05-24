@@ -651,7 +651,7 @@ def main():
     }
     </style>
     <div class="footer">
-        Copyright © 2025 Peraisoodan Viswanath S. All rights reserved.
+        © 2025 Peraisoodan Viswanath S. All rights reserved.
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
