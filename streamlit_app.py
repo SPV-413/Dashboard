@@ -456,7 +456,10 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
     # --- Geospatial Analysis ---
     st.markdown("---")
     st.markdown("##### 🌍 Geospatial Analysis")
-    map_type = st.selectbox("Select Map Type", ["Scatter Map", "Choropleth Map"], key="map_type_selector")
+    # Multiple free map options:
+    map_type = st.selectbox("Select Map Type",
+                            ["Scatter Map", "Choropleth Map", "Density Map", "Bubble Map"],
+                            key="map_type_selector")
     lat_found = next((c for c in geo_cols if 'lat' in c.lower()), None)
     lon_found = next((c for c in geo_cols if 'lon' in c.lower()), None)
 
@@ -482,19 +485,19 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
                         elif pd.api.types.is_categorical_dtype(df[color_col_map]) or df[color_col_map].dtype == 'object':
                             st.info(f"Coloring map points by categorical column: '{color_col_map}'.")
                             if df[color_col_map].nunique() > 50:
-                                st.warning(f"'{color_col_map}' has too many unique values for effective coloring. Consider a different column.")
+                                st.warning(f"'{color_col_map}' has too many unique values ({df[color_col_map].nunique()}) for effective coloring. Consider a different column.")
                             fig_colored = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, color=color_col_map,
                                                             zoom=3, height=400, title=f"Map: Locations colored by {color_col_map}",
                                                             color_discrete_sequence=px.colors.qualitative.Plotly)
                             fig_colored.update_layout(mapbox_style="open-street-map")
                             charts_bivariate.append(fig_colored)
                         else:
-                            st.warning(f"Selected column '{color_col_map}' is not suitable for coloring.")
+                            st.warning(f"Selected column '{color_col_map}' is not suitable for coloring (must be numeric or categorical).")
                 elif color_by_col_map_check and not all_colorable_cols:
-                    st.info("No other suitable columns to color the map points by.")
+                    st.info("No other suitable columns (numeric or categorical) to color the map points by.")
         else:
-            st.info("Latitude and Longitude columns not found for Scatter Map.")
-    
+            st.info("Latitude and Longitude columns not found. Please ensure your dataset has valid lat and long fields for a Scatter Map.")
+
     elif map_type == "Choropleth Map":
         if geo_cols and numeric_cols:
             region_col_candidates = [c for c in geo_cols if c not in [lat_found, lon_found]]
@@ -523,7 +526,36 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
             else:
                 st.info("No suitable region/country column found for Choropleth Map.")
         else:
-            st.info("Geospatial columns are insufficient for a Choropleth Map.")
+            st.info("Geospatial columns are insufficient to create a Choropleth Map.")
+
+    elif map_type == "Density Map":
+        if lat_found and lon_found:
+            st.write(f"Density Map using Latitude: *{lat_found}* and Longitude: *{lon_found}*")
+            if numeric_cols:
+                density_col = st.selectbox("Select numeric column for density weight", numeric_cols, key="density_map_numeric")
+                radius_val = st.slider("Select radius for density map", 5, 50, 10, key="density_radius")
+                fig = px.density_mapbox(df, lat=lat_found, lon=lon_found, z=density_col, radius=radius_val,
+                                        zoom=3, height=400, title=f"Density Map of {density_col}",
+                                        mapbox_style="open-street-map")
+                charts_bivariate.append(fig)
+            else:
+                st.info("No numeric column available for density mapping.")
+        else:
+            st.info("Latitude and Longitude columns not found for Density Map.")
+
+    elif map_type == "Bubble Map":
+        if lat_found and lon_found:
+            st.write(f"Bubble Map using Latitude: *{lat_found}* and Longitude: *{lon_found}*")
+            if numeric_cols:
+                bubble_size = st.selectbox("Select numeric column for Bubble Map size", numeric_cols, key="bubble_map_size")
+                fig = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, size=bubble_size, color=bubble_size,
+                                        zoom=3, height=400, title=f"Bubble Map: Size by {bubble_size}", template="plotly_white")
+                fig.update_layout(mapbox_style="open-street-map")
+                charts_bivariate.append(fig)
+            else:
+                st.info("No numeric column available for bubble map.")
+        else:
+            st.info("Latitude and Longitude columns not found for Bubble Map.")
 
     return charts_bivariate
 
