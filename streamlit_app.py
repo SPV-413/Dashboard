@@ -434,7 +434,7 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
 
     # Time Series Analysis (Datetime vs. Numeric)
     st.markdown("---")
-    st.markdown("##### Time Series Analysis (Datetime vs. Numeric)")
+    st.markdown("##### 📈 Time Series Analysis (Datetime vs. Numeric)")
     if datetime_cols and numeric_cols:
         col1, col2 = st.columns(2)
         with col1:
