@@ -458,7 +458,7 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
     st.markdown("##### 🌍 Geospatial Analysis")
     # Multiple free map options:
     map_type = st.selectbox("Select Map Type",
-                            ["Scatter Map", "Choropleth Map", "Density Map", "Bubble Map"],
+                            ["Scatter Map", "Choropleth Map", "Density Map"],
                             key="map_type_selector")
     lat_found = next((c for c in geo_cols if 'lat' in c.lower()), None)
     lon_found = next((c for c in geo_cols if 'lon' in c.lower()), None)
