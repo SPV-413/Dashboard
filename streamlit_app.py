@@ -548,10 +548,16 @@ def plot_charts_bivariate(df, numeric_cols, categorical_cols, datetime_cols, geo
             st.write(f"Bubble Map using Latitude: *{lat_found}* and Longitude: *{lon_found}*")
             if numeric_cols:
                 bubble_size = st.selectbox("Select numeric column for Bubble Map size", numeric_cols, key="bubble_map_size")
-                fig = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, size=bubble_size, color=bubble_size,
-                                        zoom=3, height=400, title=f"Bubble Map: Size by {bubble_size}", template="plotly_white")
-                fig.update_layout(mapbox_style="open-street-map")
-                charts_bivariate.append(fig)
+                # Ensure the selected column is numeric and has positive values
+                df[bubble_size] = pd.to_numeric(df[bubble_size], errors='coerce')
+                if df[bubble_size].max() is None or df[bubble_size].max() <= 0:
+                    st.warning("The selected bubble size column does not have positive values.")
+                else:
+                    # Remove the color argument to avoid validation error
+                    fig = px.scatter_mapbox(df, lat=lat_found, lon=lon_found, size=bubble_size,
+                                            zoom=3, height=400, title=f"Bubble Map: Size by {bubble_size}", template="plotly_white")
+                    fig.update_layout(mapbox_style="open-street-map")
+                    charts_bivariate.append(fig)
             else:
                 st.info("No numeric column available for bubble map.")
         else:
