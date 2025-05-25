@@ -23,7 +23,7 @@ AutoViz Dashboard is an interactive data visualization tool built with Streamlit
 
 - Data Preview & Cleaning: Preview your dataset and choose to remove unwanted features. The app then cleans your data by handling missing values, duplicates, and outliers—all while logging the changes for transparency.
 
-- Configure & Filter: Dynamically filter your data using interactive sidebars to narrow down on specific categorical or numeric features.
+- Configure & Filter: Dynamically filter your data using interactive sidebars to narrow down on specific categorical features.
 
 - Visualize & Explore: Instantly generate a host of charts:
 
