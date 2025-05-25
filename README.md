@@ -27,11 +27,11 @@ AutoViz Dashboard is an interactive data visualization tool built with Streamlit
 
 - Visualize & Explore: Instantly generate a host of charts:
 
-- Univariate Visuals to understand distributions
+  - Univariate Visuals to understand distributions
 
-- Bivariate & Correlation Analyses for relationships
+  - Bivariate & Correlation Analyses for relationships
 
-- Time Series & Geospatial Visualizations for trend spotting and location data insights
+  - Time Series & Geospatial Visualizations for trend spotting and location data insights
 
 ## Business Use Cases
 - **Data Exploration & Reporting**: Quickly convert raw data into visual stories to share with stakeholders, making complex analyses accessible to non-technical teams.
