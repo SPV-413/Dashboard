@@ -49,6 +49,10 @@ AutoViz Dashboard is an interactive data visualization tool built with Streamlit
 
 - **Decision Makers**: Seeking easy-to-understand visuals to support evidence-based strategies.
 
+           
+# Note
+Data visualization charts can be zoomed in and out, reset, and downloaded.
+
 ## Link
 https://autoviz-dashboard.streamlit.app/
 
