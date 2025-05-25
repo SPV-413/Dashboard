@@ -34,17 +34,20 @@ AutoViz Dashboard is an interactive data visualization tool built with Streamlit
 - Time Series & Geospatial Visualizations for trend spotting and location data insights
 
 ## Business Use Cases
-- Data Exploration & Reporting: Quickly convert raw data into visual stories to share with stakeholders, making complex analyses accessible to non-technical teams.
+- **Data Exploration & Reporting**: Quickly convert raw data into visual stories to share with stakeholders, making complex analyses accessible to non-technical teams.
 
-- Market & Location Analysis: Leverage geospatial features to analyze regional trends, customer distribution, or operational footprints.
+- **Market & Location Analysis**: Leverage geospatial features to analyze regional trends, customer distribution, or operational footprints.
 
-- Pre-Modeling Preparation: Clean and preprocess datasets to serve as precise inputs for further advanced analytics or machine learning workflows.
+- **Pre-Modeling Preparation**: Clean and preprocess datasets to serve as precise inputs for further advanced analytics or machine learning workflows.
 
 ## Who Can Use This App
-- Data Analysts & Scientists: For rapid, exploratory data analysis without complex coding.
+- **Data Analysts & Scientists**: For rapid, exploratory data analysis without complex coding.
 
-- Business Professionals: To generate dashboards and reports that drive strategic decisions.
+- **Business Professionals**: To generate dashboards and reports that drive strategic decisions.
 
-- Researchers: Who need to visualize trends and patterns effectively in their datasets.
+- **Researchers**: Who need to visualize trends and patterns effectively in their datasets.
 
-- Decision Makers: Seeking easy-to-understand visuals to support evidence-based strategies.
+- **Decision Makers**: Seeking easy-to-understand visuals to support evidence-based strategies.
+
+## Contact
+For any inquiries, reach out via GitHub or email.
